@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace UGF.Tables.Editor
 {
-    [CustomPropertyDrawer(typeof( TableEntryDropdownAttribute), true)]
+    [CustomPropertyDrawer(typeof(TableEntryDropdownAttribute), true)]
     internal class TableEntryDropdownPropertyDrawer : PropertyDrawerTyped<TableEntryDropdownAttribute>
     {
         private readonly TableEntryDropdownDrawer m_drawer = new TableEntryDropdownDrawer();
 
-        public TableEntryDropdownPropertyDrawer() : base(SerializedPropertyType.Generic)
+        public TableEntryDropdownPropertyDrawer() : base(SerializedPropertyType.Hash128)
         {
         }
 
