@@ -8,7 +8,6 @@ namespace UGF.Tables.Editor
     public static class TableTreeEditorClipboard
     {
         public static int EntriesCount { get { return TableTreeEditorUserSettings.Settings.GetData().Clipboard.Entries.Count; } }
-        public static int ChildrenCount { get { return TableTreeEditorUserSettings.Settings.GetData().Clipboard.Children.Count; } }
 
         public static TableTreeEditorClipboardData GetData()
         {
@@ -33,7 +32,7 @@ namespace UGF.Tables.Editor
         {
             TableTreeEditorUserSettingsData data = TableTreeEditorUserSettings.Settings.GetData();
 
-            return data.Clipboard.Entries.Count > 0 || data.Clipboard.Children.Count > 0;
+            return data.Clipboard.Entries.Count > 0;
         }
 
         public static void CopyType(Type type)
@@ -62,26 +61,12 @@ namespace UGF.Tables.Editor
             return true;
         }
 
-        public static bool TryCopyChildren(IReadOnlyList<TableTreeViewItem> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-
-            if (!TableTreeEditorClipboardUtility.TryCopy(items, TableTreeEditorUserSettings.Settings.GetData().Clipboard.Children, out Exception error))
-            {
-                Debug.LogWarning($"Table entry child can not be copied.\n{error}");
-                return false;
-            }
-
-            return true;
-        }
-
         public static void Clear()
         {
             TableTreeEditorUserSettingsData data = TableTreeEditorUserSettings.Settings.GetData();
 
             data.Clipboard.Type.Clear();
             data.Clipboard.Entries.Clear();
-            data.Clipboard.Children.Clear();
         }
     }
 }

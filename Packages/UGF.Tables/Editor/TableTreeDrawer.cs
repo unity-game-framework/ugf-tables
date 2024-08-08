@@ -58,7 +58,6 @@ namespace UGF.Tables.Editor
             public GUIContent MenuContextPaste { get; } = new GUIContent("Paste");
             public GUIContent MenuContextColumnCopy { get; } = new GUIContent("Copy Values");
             public GUIContent MenuContextColumnPaste { get; } = new GUIContent("Paste Values");
-            public GUIContent AddButtonChildrenContent { get; } = new GUIContent(EditorGUIUtility.FindTexture("Toolbar Plus"), "Add new or duplicate selected children.");
             public GUILayoutOption[] ToolbarButtonOptions { get; } = { GUILayout.Width(50F) };
             public GUILayoutOption[] ToolbarButtonSmallOptions { get; } = { GUILayout.Width(25F) };
 
@@ -166,44 +165,9 @@ namespace UGF.Tables.Editor
             TableTreeEditorInternalUtility.PropertyInsert(TreeView.PropertyEntries, index, m_entryInitializeHandler, value);
         }
 
-        public void AddChildren(TableTreeViewItem item, IReadOnlyList<object> values)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            AddChildren(item, item.PropertyChildren.arraySize, values);
-        }
-
-        public void AddChildren(TableTreeViewItem item, int index, IReadOnlyList<object> values)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            TableTreeEditorInternalUtility.PropertyInsert(item.PropertyChildren, index, values);
-        }
-
-        public void AddChild(TableTreeViewItem item, object value = null)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            AddChild(item, item.PropertyChildren.arraySize, value);
-        }
-
-        public void AddChild(TableTreeViewItem item, int index, object value = null)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            TableTreeEditorInternalUtility.PropertyInsert(item.PropertyChildren, index, value);
-        }
-
         public void DuplicateEntry(IReadOnlyList<int> indexes)
         {
             TableTreeEditorInternalUtility.PropertyInsert(TreeView.PropertyEntries, indexes, m_entryInitializeHandler);
-        }
-
-        public void DuplicateChildren(TableTreeViewItem item, IReadOnlyList<int> indexes)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            TableTreeEditorInternalUtility.PropertyInsert(item.PropertyChildren, indexes);
         }
 
         public void RemoveEntries(IReadOnlyList<int> indexes)
@@ -214,20 +178,6 @@ namespace UGF.Tables.Editor
         public void RemoveEntry(int index)
         {
             TreeView.PropertyEntries.DeleteArrayElementAtIndex(index);
-        }
-
-        public void RemoveChildren(TableTreeViewItem item, IReadOnlyList<int> indexes)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            TableTreeEditorInternalUtility.PropertyRemove(item.PropertyChildren, indexes);
-        }
-
-        public void RemoveChild(TableTreeViewItem item, int index)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            item.PropertyChildren.DeleteArrayElementAtIndex(index);
         }
 
         public void PasteEntriesValues(IReadOnlyList<TableTreeViewItem> items, IReadOnlyList<object> values)
@@ -252,8 +202,7 @@ namespace UGF.Tables.Editor
 
             foreach ((TableTreeColumnOptions column, SerializedProperty serializedProperty) in item.ColumnProperties)
             {
-                if (column.PropertyName != Options.PropertyIdName
-                    && column.PropertyName != Options.PropertyChildrenName)
+                if (column.PropertyName != Options.PropertyIdName)
                 {
                     TableTreeEditorClipboardUtility.TrySetPropertyValueFromEntryField(serializedProperty, value);
                 }
@@ -369,11 +318,6 @@ namespace UGF.Tables.Editor
                         builder.Append($" Entries {TableTreeEditorClipboard.EntriesCount}");
                     }
 
-                    if (TableTreeEditorClipboard.ChildrenCount > 0)
-                    {
-                        builder.Append($" Children {TableTreeEditorClipboard.ChildrenCount}");
-                    }
-
                     using (new EditorGUILayout.HorizontalScope(m_styles.FooterSection))
                     {
                         GUILayout.Label(builder.ToString(), m_styles.FooterButtonOptions);
@@ -401,19 +345,13 @@ namespace UGF.Tables.Editor
 
                 if (TreeView.HasSelected())
                 {
-                    int entryCount = TreeView.GetSelectedCount(TableTreeEntryType.Entry);
-                    int childCount = TreeView.GetSelectedCount(TableTreeEntryType.Child);
+                    int entryCount = TreeView.GetSelectedCount();
 
                     var builder = new StringBuilder("Selected:");
 
                     if (entryCount > 0)
                     {
                         builder.Append($" Entries {entryCount}");
-                    }
-
-                    if (childCount > 0)
-                    {
-                        builder.Append($" Children {childCount}");
                     }
 
                     using (new EditorGUILayout.HorizontalScope(m_styles.FooterSection))
@@ -466,14 +404,7 @@ namespace UGF.Tables.Editor
         {
             if (serializedProperty.isArray && serializedProperty.propertyType == SerializedPropertyType.Generic)
             {
-                if (serializedProperty.name == Options.PropertyChildrenName)
-                {
-                    OnDrawRowCellChildren(position, item, serializedProperty, column);
-                }
-                else
-                {
-                    OnDrawRowCellArray(position, item, serializedProperty, column);
-                }
+                OnDrawRowCellArray(position, item, serializedProperty, column);
             }
             else
             {
@@ -502,30 +433,6 @@ namespace UGF.Tables.Editor
             using (new EditorGUI.DisabledScope(true))
             {
                 EditorGUI.IntField(position, GUIContent.none, serializedProperty.arraySize);
-            }
-        }
-
-        protected virtual void OnDrawRowCellChildren(Rect position, TableTreeViewItem item, SerializedProperty serializedProperty, TableTreeColumnOptions column)
-        {
-            float height = EditorGUIUtility.singleLineHeight;
-            float space = EditorGUIUtility.standardVerticalSpacing;
-
-            var rectField = new Rect(position.x, position.y, position.width - height - space, height);
-            var rectButton = new Rect(rectField.xMax + space, position.y + 1F, height, height);
-
-            int count = item.PropertyChildrenSize.intValue;
-
-            EditorGUI.PropertyField(rectField, item.PropertyChildrenSize, GUIContent.none);
-
-            if (count != item.PropertyChildrenSize.intValue)
-            {
-                TreeView.Reload();
-                GUIUtility.ExitGUI();
-            }
-
-            if (GUI.Button(rectButton, m_styles.AddButtonChildrenContent, EditorStyles.iconButton))
-            {
-                OnEntryAddChildren(item);
             }
         }
 
@@ -590,17 +497,6 @@ namespace UGF.Tables.Editor
 
         private void OnEntryAdd()
         {
-            TreeView.GetChildrenParentSelection(m_selectedItems);
-
-            foreach (TableTreeViewItem item in m_selectedItems)
-            {
-                TreeView.GetChildrenSelectionIndexes(item, m_selectedIndexes);
-
-                DuplicateChildren(item, m_selectedIndexes);
-
-                m_selectedIndexes.Clear();
-            }
-
             TreeView.GetSelectionIndexes(m_selectedIndexes);
 
             if (m_selectedIndexes.Count > 0)
@@ -618,38 +514,8 @@ namespace UGF.Tables.Editor
             TreeView.Apply();
         }
 
-        private void OnEntryAddChildren(TableTreeViewItem item)
-        {
-            TreeView.GetChildrenSelectionIndexes(item, m_selectedIndexes);
-
-            if (m_selectedIndexes.Count > 0)
-            {
-                DuplicateChildren(item, m_selectedIndexes);
-
-                m_selectedIndexes.Clear();
-            }
-            else
-            {
-                AddChild(item);
-            }
-
-            TreeView.Apply();
-            TreeView.SetExpanded(item.id, true);
-        }
-
         private void OnEntryRemove()
         {
-            TreeView.GetChildrenParentSelection(m_selectedItems);
-
-            foreach (TableTreeViewItem item in m_selectedItems)
-            {
-                TreeView.GetChildrenSelectionIndexes(item, m_selectedIndexes);
-
-                RemoveChildren(item, m_selectedIndexes);
-
-                m_selectedIndexes.Clear();
-            }
-
             TreeView.GetSelectionIndexes(m_selectedIndexes);
 
             if (m_selectedIndexes.Count > 0)
@@ -667,15 +533,9 @@ namespace UGF.Tables.Editor
         {
             TableTreeEditorClipboard.Clear();
 
-            TreeView.GetSelection(m_selectedItems, TableTreeEntryType.Entry);
+            TreeView.GetSelection(m_selectedItems);
 
             TableTreeEditorClipboard.TryCopyEntries(m_selectedItems);
-
-            m_selectedItems.Clear();
-
-            TreeView.GetSelection(m_selectedItems, TableTreeEntryType.Child);
-
-            TableTreeEditorClipboard.TryCopyChildren(m_selectedItems);
 
             m_selectedItems.Clear();
 
@@ -692,44 +552,9 @@ namespace UGF.Tables.Editor
             {
                 TableTreeEditorClipboardData clipboard = TableTreeEditorClipboard.GetData();
 
-                if (clipboard.Children.Count > 0)
-                {
-                    TreeView.GetSelection(m_selectedItems, TableTreeEntryType.Child);
-
-                    if (m_selectedItems.Count > 0)
-                    {
-                        for (int i = 0; i < m_selectedItems.Count; i++)
-                        {
-                            TableTreeViewItem item = m_selectedItems[i];
-
-                            var parent = (TableTreeViewItem)item.parent;
-
-                            AddChildren(parent, item.Index, clipboard.Children);
-                        }
-
-                        m_selectedItems.Clear();
-                    }
-
-                    TreeView.GetSelection(m_selectedItems, TableTreeEntryType.Entry);
-
-                    if (m_selectedItems.Count > 0)
-                    {
-                        for (int i = 0; i < m_selectedItems.Count; i++)
-                        {
-                            TableTreeViewItem item = m_selectedItems[i];
-
-                            AddChildren(item, clipboard.Children);
-
-                            TreeView.SetExpanded(item.id, true);
-                        }
-
-                        m_selectedItems.Clear();
-                    }
-                }
-
                 if (clipboard.Entries.Count > 0)
                 {
-                    TreeView.GetSelection(m_selectedItems, TableTreeEntryType.Entry);
+                    TreeView.GetSelection(m_selectedItems);
 
                     if (m_selectedItems.Count > 0)
                     {
@@ -756,35 +581,22 @@ namespace UGF.Tables.Editor
 
         private void OnEntryPasteValues()
         {
-            OnEntryPasteValues(TableTreeEntryType.Entry);
-            OnEntryPasteValues(TableTreeEntryType.Child);
-        }
-
-        private void OnEntryPasteValues(TableTreeEntryType entryType)
-        {
             if (TableTreeEditorClipboard.HasAny() && TableTreeEditorClipboard.HasMatch(m_targetType))
             {
                 TableTreeEditorClipboardData clipboard = TableTreeEditorClipboard.GetData();
 
-                List<object> entries = entryType switch
-                {
-                    TableTreeEntryType.Entry => clipboard.Entries,
-                    TableTreeEntryType.Child => clipboard.Children,
-                    _ => throw new ArgumentOutOfRangeException(nameof(entryType), entryType, "Table tree column entry type is unknown.")
-                };
-
-                if (entries.Count > 0)
+                if (clipboard.Entries.Count > 0)
                 {
                     if (TreeView.HasSelected())
                     {
-                        TreeView.GetSelection(m_selectedItems, entryType);
+                        TreeView.GetSelection(m_selectedItems);
                     }
                     else
                     {
-                        TreeView.GetItems(m_selectedItems, entryType);
+                        TreeView.GetItems(m_selectedItems);
                     }
 
-                    PasteEntriesValues(m_selectedItems, entries);
+                    PasteEntriesValues(m_selectedItems, clipboard.Entries);
 
                     m_selectedItems.Clear();
                 }
@@ -799,25 +611,18 @@ namespace UGF.Tables.Editor
             {
                 TableTreeEditorClipboardData clipboard = TableTreeEditorClipboard.GetData();
 
-                List<object> entries = column.EntryType switch
-                {
-                    TableTreeEntryType.Entry => clipboard.Entries,
-                    TableTreeEntryType.Child => clipboard.Children,
-                    _ => throw new ArgumentOutOfRangeException(nameof(column.EntryType), column.EntryType, "Table tree column entry type is unknown.")
-                };
-
-                if (entries.Count > 0)
+                if (clipboard.Entries.Count > 0)
                 {
                     if (TreeView.HasSelected())
                     {
-                        TreeView.GetSelection(m_selectedItems, column.EntryType);
+                        TreeView.GetSelection(m_selectedItems);
                     }
                     else
                     {
-                        TreeView.GetItems(m_selectedItems, column.EntryType);
+                        TreeView.GetItems(m_selectedItems);
                     }
 
-                    PasteEntryValues(column, m_selectedItems, entries);
+                    PasteEntryValues(column, m_selectedItems, clipboard.Entries);
 
                     m_selectedItems.Clear();
                 }
@@ -949,20 +754,12 @@ namespace UGF.Tables.Editor
 
             if (column.HasValue
                 && column.Value.PropertyName != Options.PropertyIdName
-                && column.Value.PropertyName != Options.PropertyChildrenName
                 && TableTreeEditorClipboard.HasAny()
                 && TableTreeEditorClipboard.HasMatch(m_targetType))
             {
                 TableTreeEditorClipboardData clipboard = TableTreeEditorClipboard.GetData();
 
-                bool hasEntries = column.Value.EntryType switch
-                {
-                    TableTreeEntryType.Entry => clipboard.Entries.Count > 0,
-                    TableTreeEntryType.Child => clipboard.Children.Count > 0,
-                    _ => throw new ArgumentOutOfRangeException(nameof(column.Value.EntryType), column.Value.EntryType, "Table tree column entry type is unknown.")
-                };
-
-                if (hasEntries)
+                if (clipboard.Entries.Count > 0)
                 {
                     menu.AddItem(m_styles.MenuContextColumnPaste, false, () => OnEntryPasteValues(column));
                 }

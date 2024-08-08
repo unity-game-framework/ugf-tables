@@ -170,17 +170,9 @@ namespace UGF.Tables.Editor
 
             Type entryType = GetTableEntryType(tableType);
 
-            if (!TryGetEntryChildrenPropertyName(entryType, out string childrenPropertyName))
-            {
-                childrenPropertyName = "m_children";
-            }
-
             List<TableTreeColumnOptions> columns = CreateColumnOptions(entryType);
 
-            return new TableTreeOptions(columns)
-            {
-                PropertyChildrenName = childrenPropertyName
-            };
+            return new TableTreeOptions(columns);
         }
 
         public static List<TableTreeColumnOptions> CreateColumnOptions(Type entryType)
@@ -188,11 +180,6 @@ namespace UGF.Tables.Editor
             if (entryType == null) throw new ArgumentNullException(nameof(entryType));
 
             var columns = new List<TableTreeColumnOptions>();
-
-            if (!TryGetEntryChildrenPropertyName(entryType, out string childrenPropertyName))
-            {
-                childrenPropertyName = "m_children";
-            }
 
             List<FieldInfo> fields = TableTreeEditorInternalUtility.GetSerializedFields(entryType);
 
@@ -202,20 +189,13 @@ namespace UGF.Tables.Editor
 
                 string displayName = ObjectNames.NicifyVariableName(field.Name);
 
-                columns.Add(new TableTreeColumnOptions(field.Name, displayName, TableTreeEntryType.Entry));
-
-                if (field.Name == childrenPropertyName)
-                {
-                    Type type = GetTableEntryChildrenType(field.FieldType);
-
-                    CreateColumnOptionsFromFields(columns, TableTreeEditorInternalUtility.GetSerializedFields(type), TableTreeEntryType.Child);
-                }
+                columns.Add(new TableTreeColumnOptions(field.Name, displayName));
             }
 
             return columns;
         }
 
-        public static void CreateColumnOptionsFromFields(ICollection<TableTreeColumnOptions> columns, IReadOnlyList<FieldInfo> fields, TableTreeEntryType entryType)
+        public static void CreateColumnOptionsFromFields(ICollection<TableTreeColumnOptions> columns, IReadOnlyList<FieldInfo> fields)
         {
             if (columns == null) throw new ArgumentNullException(nameof(columns));
             if (fields == null) throw new ArgumentNullException(nameof(fields));
@@ -226,24 +206,8 @@ namespace UGF.Tables.Editor
 
                 string displayName = ObjectNames.NicifyVariableName(field.Name);
 
-                columns.Add(new TableTreeColumnOptions(field.Name, displayName, entryType));
+                columns.Add(new TableTreeColumnOptions(field.Name, displayName));
             }
-        }
-
-        public static bool TryGetEntryChildrenPropertyName(Type entryType, out string propertyName)
-        {
-            if (entryType == null) throw new ArgumentNullException(nameof(entryType));
-
-            var attribute = entryType.GetCustomAttribute<TableEntryChildrenAttribute>();
-
-            if (attribute != null)
-            {
-                propertyName = attribute.PropertyName;
-                return true;
-            }
-
-            propertyName = default;
-            return false;
         }
 
         public static Type GetTableEntryType(Type tableType)
@@ -258,25 +222,6 @@ namespace UGF.Tables.Editor
             }
 
             return genericArguments[0];
-        }
-
-        public static Type GetTableEntryChildrenType(Type collectionType)
-        {
-            if (collectionType == null) throw new ArgumentNullException(nameof(collectionType));
-
-            if (collectionType.IsArray)
-            {
-                return collectionType.GetElementType();
-            }
-
-            if (collectionType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                Type[] genericArguments = collectionType.GetGenericArguments();
-
-                return genericArguments[0];
-            }
-
-            throw new ArgumentException($"Table entry children type is unknown: '{collectionType}'.");
         }
     }
 }

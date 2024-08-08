@@ -10,17 +10,11 @@ namespace UGF.Tables.Editor
         public string PropertyEntriesName { get; set; } = "m_entries";
         public string PropertyIdName { get; set; } = "m_id";
         public string PropertyNameName { get; set; } = "m_name";
-        public string PropertyChildrenName { get; set; } = "m_children";
         public float RowHeight { get; set; } = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing * 2F;
 
         public TableTreeOptions(IReadOnlyList<TableTreeColumnOptions> columns)
         {
             Columns = columns ?? throw new ArgumentNullException(nameof(columns));
-        }
-
-        public bool TryGetChildrenColumn(out TableTreeColumnOptions options)
-        {
-            return TryGetColumn(PropertyChildrenName, out options);
         }
 
         public bool TryGetColumn(string propertyName, out TableTreeColumnOptions column)
