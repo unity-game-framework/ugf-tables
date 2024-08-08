@@ -299,7 +299,7 @@ namespace UGF.Tables.Editor
                 string path = AssetDatabase.GetAssetPath(SerializedObject.targetObject);
                 int columnsVisible = TreeView.multiColumnHeader.state.visibleColumns.Length;
                 int columnsTotal = TreeView.multiColumnHeader.state.columns.Length;
-                int countVisible = TreeView.VisibleEntryCount;
+                int countVisible = TreeView.VisibleCount;
                 int countTotal = TreeView.PropertyEntries.arraySize;
 
                 if (GUILayout.Button($"Path: {path}", m_styles.FooterSection, m_styles.FooterButtonOptions))

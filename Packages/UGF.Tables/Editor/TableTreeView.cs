@@ -21,7 +21,6 @@ namespace UGF.Tables.Editor
         public bool HasSortColumn { get { return Header.sortedColumnIndex >= 0 && Header.sortedColumnIndex < Options.Columns.Count; } }
         public int ItemsCount { get { return m_items.Count; } }
         public int VisibleCount { get; private set; }
-        public int VisibleEntryCount { get; private set; }
         public int ColumnCount { get { return Header.state.columns.Length; } }
         public int ColumnVisibleCount { get { return Header.state.visibleColumns.Length; } }
         public TableTreeViewHeader Header { get { return (TableTreeViewHeader)multiColumnHeader; } }
@@ -126,12 +125,6 @@ namespace UGF.Tables.Editor
             }
 
             VisibleCount = items.Count;
-            VisibleEntryCount = 0;
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                VisibleEntryCount++;
-            }
 
             return items;
         }
@@ -246,7 +239,7 @@ namespace UGF.Tables.Editor
             {
                 int id = state.selectedIDs[i];
 
-                if (TryGetItem(id, out TableTreeViewItem item))
+                if (TryGetItem(id, out _))
                 {
                     count++;
                 }
