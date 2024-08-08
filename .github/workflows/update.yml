@@ -25,6 +25,8 @@ env:
   source: ${{ github.workspace }}/source/${{ github.event.inputs.target }}
   target: ${{ github.workspace }}/target/${{ github.event.inputs.target }}
 
+permissions: write-all
+
 jobs:
   main:
     name: Main
@@ -46,7 +48,6 @@ jobs:
         rm -rf ${{ env.target }}
         cp -r ${{ env.source }} ${{ env.target }}
     - name: Push
-      permissions: write-all
       run: |
         cd ${{ github.workspace }}/${{ env.targetFolder }}
 
