@@ -1,5 +1,5 @@
 ﻿using System;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 using UnityEngine;
 

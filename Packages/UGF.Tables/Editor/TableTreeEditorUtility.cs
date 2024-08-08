@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UGF.EditorTools.Editor.IMGUI;
 using UGF.EditorTools.Runtime.Ids;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;

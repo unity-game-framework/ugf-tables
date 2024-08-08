@@ -1,11 +1,11 @@
 ﻿using UGF.EditorTools.Editor.IMGUI.PropertyDrawers;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 using UnityEngine;
 
 namespace UGF.Tables.Editor
 {
-    [CustomPropertyDrawer(typeof(TableEntryDropdownAttribute), true)]
+    [CustomPropertyDrawer(typeof( TableEntryDropdownAttribute), true)]
     internal class TableEntryDropdownPropertyDrawer : PropertyDrawerTyped<TableEntryDropdownAttribute>
     {
         private readonly TableEntryDropdownDrawer m_drawer = new TableEntryDropdownDrawer();

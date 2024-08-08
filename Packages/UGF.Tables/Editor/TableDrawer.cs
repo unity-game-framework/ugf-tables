@@ -5,7 +5,7 @@ using UGF.EditorTools.Editor.IMGUI;
 using UGF.EditorTools.Editor.IMGUI.Dropdown;
 using UGF.EditorTools.Editor.Serialized;
 using UGF.EditorTools.Runtime.Ids;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,6 +1,6 @@
 ﻿using UGF.EditorTools.Editor.IMGUI;
 using UGF.EditorTools.Editor.IMGUI.Scopes;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 
 namespace UGF.Tables.Editor

@@ -1,4 +1,4 @@
-﻿using UGF.RuntimeTools.Runtime.Tables;
+﻿using UGF.Tables.Runtime;
 using UnityEngine;
 
 namespace UGF.Tables.Editor

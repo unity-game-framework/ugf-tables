@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UGF.RuntimeTools.Runtime.Tables;
+using UGF.Tables.Runtime;
 using UnityEditor;
 
 namespace UGF.Tables.Editor
