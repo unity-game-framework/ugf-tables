@@ -203,10 +203,8 @@ namespace UGF.Tables.Editor
                 TableAsset asset = tables[i];
                 ITable table = asset.Get();
 
-                for (int index = 0; index < table.Entries.Count; index++)
+                foreach (ITableEntry entry in table.GetEntries())
                 {
-                    ITableEntry entry = table.Entries[index];
-
                     items.Add(new DropdownItem<GlobalId>(entry.Name, entry.Id)
                     {
                         Path = asset.name

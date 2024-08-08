@@ -2,7 +2,7 @@
 
 namespace UGF.Tables.Runtime
 {
-    public abstract class TableAsset<TEntry> : TableAsset where TEntry : class, ITableEntry
+    public abstract class TableAsset<TEntry> : TableAsset where TEntry : ITableEntry
     {
         [SerializeField] private Table<TEntry> m_table = new Table<TEntry>();
 

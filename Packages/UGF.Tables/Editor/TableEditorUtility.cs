@@ -104,28 +104,8 @@ namespace UGF.Tables.Editor
             {
                 ITable table = tables[i].Get();
 
-                if (TryGetEntryName(table, id, out name))
+                if (table.TryGetEntryName(id, out name))
                 {
-                    return true;
-                }
-            }
-
-            name = default;
-            return false;
-        }
-
-        public static bool TryGetEntryName(ITable table, GlobalId id, out string name)
-        {
-            if (table == null) throw new ArgumentNullException(nameof(table));
-            if (!id.IsValid()) throw new ArgumentException("Value should be valid.", nameof(id));
-
-            for (int i = 0; i < table.Entries.Count; i++)
-            {
-                ITableEntry entry = table.Entries[i];
-
-                if (entry.Id == id)
-                {
-                    name = entry.Name;
                     return true;
                 }
             }
