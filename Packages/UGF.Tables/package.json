@@ -1,0 +1,22 @@
+{
+  "name": "com.ugf.tables",
+  "displayName": "UGF.Tables",
+  "version": "0.0.0-preview",
+  "unity": "2023.2",
+  "apiCompatibility": ".NET Standard 2.1",
+  "description": "Provides tools to work data represented as table.",
+  "author": {
+    "name": "Unity Game Framework",
+    "url": "https://github.com/unity-game-framework"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/unity-game-framework/ugf-tables.git"
+  },
+  "changelogUrl": "https://github.com/unity-game-framework/ugf-tables/blob/main/changelog.md",
+  "licensesUrl": "https://github.com/unity-game-framework/ugf-tables/blob/main/license",
+  "publishConfig": {
+    "registry": "https://api.upmhub.org/registries/unity-game-framework"
+  },
+  "dependencies": {}
+}
