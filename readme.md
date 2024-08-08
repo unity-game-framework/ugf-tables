@@ -4,13 +4,14 @@ UGF.Tables
 
 ## Information
 
-- **Version**: `0.0.0-preview`
+- **Version**: `1.0.0-preview`
 - **Unity**: `2023.2`
 - **API Compatibility Level**: `.NET Standard 2.1`
 
 ### Dependencies
 
-- N/A
+- `com.ugf.editortools`: `3.0.0-preview.10`
+- `com.ugf.runtimetools`: `3.0.0-preview.18`
 
 
 ### Description
