@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UGF.EditorTools.Editor.Ids;
 using UGF.EditorTools.Runtime.Ids;
 using UnityEditor;
 using UnityEngine;
@@ -131,9 +130,9 @@ namespace UGF.Tables.Editor
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             SerializedProperty propertyId = serializedProperty.FindPropertyRelative(options.PropertyIdName);
-            GlobalId id = GlobalIdEditorUtility.GetGlobalIdFromProperty(propertyId);
+            GlobalId id = propertyId.hash128Value;
 
-            return (int)id.First;
+            return id.GetHashCode();
         }
 
         public static bool TryGetSerializedField(Type type, string name, out FieldInfo field)

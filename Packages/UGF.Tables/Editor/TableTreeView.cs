@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UGF.EditorTools.Editor.Ids;
 using UGF.EditorTools.Runtime.Ids;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -21,7 +20,6 @@ namespace UGF.Tables.Editor
         public bool HasSortColumn { get { return Header.sortedColumnIndex >= 0 && Header.sortedColumnIndex < Options.Columns.Count; } }
         public int ItemsCount { get { return m_items.Count; } }
         public int VisibleCount { get; private set; }
-        public int VisibleEntryCount { get; private set; }
         public int ColumnCount { get { return Header.state.columns.Length; } }
         public int ColumnVisibleCount { get { return Header.state.visibleColumns.Length; } }
         public TableTreeViewHeader Header { get { return (TableTreeViewHeader)multiColumnHeader; } }
@@ -70,7 +68,7 @@ namespace UGF.Tables.Editor
                 SerializedProperty propertyElement = PropertyEntries.GetArrayElementAtIndex(i);
                 int id = TableTreeEditorInternalUtility.GetEntryId(propertyElement, Options);
 
-                var item = new TableTreeViewItem(id, TableTreeEntryType.Entry, i, propertyElement, Options);
+                var item = new TableTreeViewItem(id, i, propertyElement, Options);
 
                 root.AddChild(item);
 
@@ -79,26 +77,6 @@ namespace UGF.Tables.Editor
                     item.id = HashCode.Combine(item.id, i);
 
                     m_items.Add(item.id, item);
-                }
-
-                SerializedProperty propertyChildren = propertyElement.FindPropertyRelative(Options.PropertyChildrenName);
-
-                if (propertyChildren != null)
-                {
-                    for (int c = 0; c < propertyChildren.arraySize; c++)
-                    {
-                        SerializedProperty propertyChild = propertyChildren.GetArrayElementAtIndex(c);
-                        int childId = HashCode.Combine(id, c);
-
-                        var child = new TableTreeViewItem(childId, TableTreeEntryType.Child, c, propertyChild, Options)
-                        {
-                            depth = 1
-                        };
-
-                        item.AddChild(child);
-
-                        m_items.Add(child.id, child);
-                    }
                 }
             }
 
@@ -146,17 +124,6 @@ namespace UGF.Tables.Editor
             }
 
             VisibleCount = items.Count;
-            VisibleEntryCount = 0;
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                var item = (TableTreeViewItem)items[i];
-
-                if (item.EntryType == TableTreeEntryType.Entry)
-                {
-                    VisibleEntryCount++;
-                }
-            }
 
             return items;
         }
@@ -184,11 +151,7 @@ namespace UGF.Tables.Editor
 
                         if (columnIndex == columnIndexForTreeFoldouts)
                         {
-                            if (Options.TryGetChildrenColumn(out _))
-                            {
-                                position.xMin += foldoutWidth + spacing * 3F;
-                            }
-
+                            position.xMin += foldoutWidth + spacing * 3F;
                             position.xMax -= spacing;
                         }
 
@@ -267,7 +230,7 @@ namespace UGF.Tables.Editor
             return false;
         }
 
-        public int GetSelectedCount(TableTreeEntryType entryType)
+        public int GetSelectedCount()
         {
             int count = 0;
 
@@ -275,32 +238,13 @@ namespace UGF.Tables.Editor
             {
                 int id = state.selectedIDs[i];
 
-                if (TryGetItem(id, out TableTreeViewItem item) && item.EntryType == entryType)
+                if (TryGetItem(id, out _))
                 {
                     count++;
                 }
             }
 
             return count;
-        }
-
-        public void GetChildrenSelectionIndexes(TableTreeViewItem item, ICollection<int> indexes)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-            if (indexes == null) throw new ArgumentNullException(nameof(indexes));
-
-            if (item.hasChildren)
-            {
-                for (int i = 0; i < item.children.Count; i++)
-                {
-                    var child = (TableTreeViewItem)item.children[i];
-
-                    if (state.selectedIDs.Contains(child.id))
-                    {
-                        indexes.Add(child.Index);
-                    }
-                }
-            }
         }
 
         public void GetSelectionIndexes(ICollection<int> indexes)
@@ -311,14 +255,14 @@ namespace UGF.Tables.Editor
             {
                 int id = state.selectedIDs[i];
 
-                if (TryGetItem(id, out TableTreeViewItem item) && item.EntryType == TableTreeEntryType.Entry)
+                if (TryGetItem(id, out TableTreeViewItem item))
                 {
                     indexes.Add(item.Index);
                 }
             }
         }
 
-        public void GetChildrenParentSelection(ICollection<TableTreeViewItem> selection)
+        public void GetSelection(ICollection<TableTreeViewItem> selection)
         {
             if (selection == null) throw new ArgumentNullException(nameof(selection));
 
@@ -326,27 +270,7 @@ namespace UGF.Tables.Editor
             {
                 int id = state.selectedIDs[i];
 
-                if (TryGetItem(id, out TableTreeViewItem item) && item.EntryType == TableTreeEntryType.Child)
-                {
-                    var parent = (TableTreeViewItem)item.parent;
-
-                    if (!selection.Contains(parent))
-                    {
-                        selection.Add(parent);
-                    }
-                }
-            }
-        }
-
-        public void GetSelection(ICollection<TableTreeViewItem> selection, TableTreeEntryType type)
-        {
-            if (selection == null) throw new ArgumentNullException(nameof(selection));
-
-            for (int i = 0; i < state.selectedIDs.Count; i++)
-            {
-                int id = state.selectedIDs[i];
-
-                if (TryGetItem(id, out TableTreeViewItem item) && item.EntryType == type)
+                if (TryGetItem(id, out TableTreeViewItem item))
                 {
                     selection.Add(item);
                 }
@@ -409,16 +333,13 @@ namespace UGF.Tables.Editor
 
             foreach ((_, TableTreeViewItem value) in m_items)
             {
-                if (value.EntryType == TableTreeEntryType.Entry)
-                {
-                    SerializedProperty propertyId = value.SerializedProperty.FindPropertyRelative(Options.PropertyIdName);
-                    GlobalId entryId = GlobalIdEditorUtility.GetGlobalIdFromProperty(propertyId);
+                SerializedProperty propertyId = value.SerializedProperty.FindPropertyRelative(Options.PropertyIdName);
+                GlobalId entryId = propertyId.hash128Value;
 
-                    if (entryId == id)
-                    {
-                        item = value;
-                        return true;
-                    }
+                if (entryId == id)
+                {
+                    item = value;
+                    return true;
                 }
             }
 
@@ -426,16 +347,13 @@ namespace UGF.Tables.Editor
             return false;
         }
 
-        public void GetItems(ICollection<TableTreeViewItem> items, TableTreeEntryType type)
+        public void GetItems(ICollection<TableTreeViewItem> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             foreach ((_, TableTreeViewItem item) in m_items)
             {
-                if (item.EntryType == type)
-                {
-                    items.Add(item);
-                }
+                items.Add(item);
             }
         }
 

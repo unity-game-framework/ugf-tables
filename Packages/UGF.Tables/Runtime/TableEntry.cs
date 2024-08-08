@@ -5,9 +5,9 @@ using UnityEngine;
 namespace UGF.Tables.Runtime
 {
     [Serializable]
-    public class TableEntry : ITableEntry
+    public struct TableEntry : ITableEntry
     {
-        [SerializeField] private GlobalId m_id;
+        [SerializeField] private Hash128 m_id;
         [SerializeField] private string m_name;
 
         public GlobalId Id { get { return m_id; } set { m_id = value; } }

@@ -60,7 +60,7 @@ namespace UGF.Tables.Editor
 
             Remove(guid);
 
-            if (table.Entries.Count > 0)
+            if (table.Count > 0)
             {
                 Add(guid, asset);
             }
@@ -72,7 +72,7 @@ namespace UGF.Tables.Editor
 
             ITable table = asset.Get();
 
-            if (table.Entries.Count > 0)
+            if (table.Count > 0)
             {
                 var entryCollection = new TableEntryCollection
                 {
@@ -82,10 +82,8 @@ namespace UGF.Tables.Editor
 
                 m_entries.Add(guid, entryCollection);
 
-                for (int i = 0; i < table.Entries.Count; i++)
+                foreach (ITableEntry entry in table.GetEntries())
                 {
-                    ITableEntry entry = table.Entries[i];
-
                     if (!m_names.TryGetValue(entry.Id, out EntryNameCollection nameCollection))
                     {
                         nameCollection = new EntryNameCollection();

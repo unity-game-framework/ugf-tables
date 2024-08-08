@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UGF.EditorTools.Editor.Ids;
 using UGF.EditorTools.Editor.IMGUI;
 using UGF.EditorTools.Editor.IMGUI.Dropdown;
 using UGF.EditorTools.Editor.IMGUI.Scopes;
@@ -100,7 +99,7 @@ namespace UGF.Tables.Editor
 
             m_styles ??= new Styles();
 
-            GlobalId id = GlobalIdEditorUtility.GetGlobalIdFromProperty(serializedProperty);
+            GlobalId id = serializedProperty.hash128Value;
             string value = id.ToString();
             GUIContent content = m_styles.NoneContent;
 
@@ -156,7 +155,7 @@ namespace UGF.Tables.Editor
             {
                 if (DropdownEditorGUIUtility.Dropdown(rectDropdown, label, content, m_itemsSelection, m_itemsHandler, out DropdownItem<GlobalId> selected))
                 {
-                    GlobalIdEditorUtility.SetGlobalIdToProperty(serializedProperty, selected.Value);
+                    serializedProperty.hash128Value = selected.Value;
                 }
 
                 if (scope.Clicked)
@@ -204,10 +203,8 @@ namespace UGF.Tables.Editor
                 TableAsset asset = tables[i];
                 ITable table = asset.Get();
 
-                for (int index = 0; index < table.Entries.Count; index++)
+                foreach (ITableEntry entry in table.GetEntries())
                 {
-                    ITableEntry entry = table.Entries[index];
-
                     items.Add(new DropdownItem<GlobalId>(entry.Name, entry.Id)
                     {
                         Path = asset.name
