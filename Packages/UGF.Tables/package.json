@@ -18,5 +18,8 @@
   "publishConfig": {
     "registry": "https://api.upmhub.org/registries/unity-game-framework"
   },
-  "dependencies": {}
+  "dependencies": {
+    "com.ugf.editortools": "3.0.0-preview.10",
+    "com.ugf.runtimetools": "3.0.0-preview.17"
+  }
 }
