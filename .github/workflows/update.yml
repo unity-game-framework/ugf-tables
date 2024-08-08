@@ -46,6 +46,7 @@ jobs:
         rm -rf ${{ env.target }}
         cp -r ${{ env.source }} ${{ env.target }}
     - name: Push
+      permissions: write-all
       run: |
         cd ${{ github.workspace }}/${{ env.targetFolder }}
 
