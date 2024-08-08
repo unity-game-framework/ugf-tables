@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UGF.EditorTools.Editor.Ids;
 using UGF.EditorTools.Editor.IMGUI;
 using UGF.EditorTools.Editor.IMGUI.Dropdown;
 using UGF.EditorTools.Runtime.Ids;
@@ -792,8 +791,7 @@ namespace UGF.Tables.Editor
             SerializedProperty propertyName = serializedProperty.FindPropertyRelative(Options.PropertyNameName);
             string entryName = propertyName.stringValue;
 
-            GlobalIdEditorUtility.SetGlobalIdToProperty(propertyId, GlobalId.Generate());
-
+            propertyId.hash128Value = GlobalId.Generate();
             propertyName.stringValue = OnGetUniqueName(!string.IsNullOrEmpty(entryName) ? entryName : "Entry");
         }
 

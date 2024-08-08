@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UGF.EditorTools.Editor.Ids;
 using UGF.EditorTools.Runtime.Ids;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -335,7 +334,7 @@ namespace UGF.Tables.Editor
             foreach ((_, TableTreeViewItem value) in m_items)
             {
                 SerializedProperty propertyId = value.SerializedProperty.FindPropertyRelative(Options.PropertyIdName);
-                GlobalId entryId = GlobalIdEditorUtility.GetGlobalIdFromProperty(propertyId);
+                GlobalId entryId = propertyId.hash128Value;
 
                 if (entryId == id)
                 {
