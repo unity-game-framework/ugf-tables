@@ -15,7 +15,7 @@ UGF.Tables
 
 ### Description
 
-Provides tools to work data represented as table.
+Provides tools to work with data represented as table.
 
 ### Changelog
 

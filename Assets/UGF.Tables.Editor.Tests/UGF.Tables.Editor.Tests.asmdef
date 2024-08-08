@@ -1,0 +1,20 @@
+{
+    "name": "UGF.Tables.Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:70b18c038e3cd134d8d2292fa93a9bbb",
+        "GUID:8ba129720c96d9d4fad15d931e53f70c",
+        "GUID:c94dd98354f7c754cb36b2c8fa761d89"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
